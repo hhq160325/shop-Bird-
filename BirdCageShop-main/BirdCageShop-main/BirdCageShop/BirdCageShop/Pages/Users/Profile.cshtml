@@ -1,0 +1,487 @@
+﻿@page "{handler?}/{id?}"
+@model BirdCageShop.Pages.Users.ProfileModel;
+@addTagHelper *, LazZiya.TagHelpers
+@using Newtonsoft.Json.Linq;
+@{
+    ViewData["Title"] = "Hồ sơ của bạn";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon" />
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap"
+          rel="stylesheet" />
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css"
+          rel="stylesheet" />
+
+    <!-- Libraries Stylesheet -->
+    <link href="/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet" />
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="/css/style.css" rel="stylesheet" />
+    <style>
+        /* Custom CSS for profile page */
+        .profile-card {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+            .profile-card h2 {
+                margin-bottom: 10px;
+            }
+
+            .profile-card label {
+                font-weight: bold;
+            }
+
+            .profile-card .form-group {
+                margin-bottom: 15px;
+            }
+
+
+        .nav-tabs .nav-link {
+            background-color: white;
+            color: #000; /* Default color for text */
+        }
+
+            .nav-tabs .nav-link.active {
+                background-color: #c5837c;
+                color: white;
+            }
+
+        .container-fluid pt-5 {
+            padding: 10%;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Page Header Start -->
+    <div class="container-fluid bg-secondary mb-5">
+        <div class="d-flex flex-column align-items-center justify-content-center"
+             style="min-height: 300px;">
+            <h1 class="font-weight-semi-bold text-uppercase mb-3">Hồ sơ</h1>
+            <div class="d-inline-flex">
+                <p class="m-0"><a href="">Trang chủ</a></p>
+                <p class="m-0 px-2">-</p>
+                <p class="m-0">Hồ sơ</p>
+            </div>
+        </div>
+    </div>
+    <!-- Page Header End -->
+    <!-- Profile Page Start -->
+    @{
+        var errorMessage = TempData["errorMessage"] as string;
+        var successMessage = TempData["successMessage"] as string;
+    }
+    <div class="alert alert-danger" style="@(string.IsNullOrEmpty(errorMessage) ? "display: none;" : "")">
+        @errorMessage
+    </div>
+
+    <!-- Hiển thị thông báo thành công -->
+    <div class="alert alert-success" style="@(string.IsNullOrEmpty(successMessage) ? "display: none;" : "")">
+        @successMessage
+    </div>
+    <div class="container-fluid pt-5">
+        <div class="row px-xl-5">
+            <div class="col-lg-6 offset-lg-3">
+                <div class="profile-card">
+                    <h2 class="text-center mb-4">Hồ sơ người dùng</h2>
+                    <form method="post" asp-page-handler="OnPost">
+                        <div class="form-group">
+                            <label for="fullname">Họ và tên</label>
+                            <input type="text"
+                                   id="fullname"
+                                   class="form-control"
+                                   asp-for="@Model.UserName" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email"
+                                   id="email"
+                                   class="form-control"
+                                   asp-for="@Model.UserEmail" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Số điện thoại</label>
+                            <input type="text"
+                                   id="phone"
+                                   class="form-control"
+                                   asp-for="@Model.Phone" required />
+                        </div>
+                        <!-- Nút để chuyển đổi hiển thị thông tin bổ sung -->
+                        <button type="button" id="toggleInfo" class="btn btn-secondary">
+                            Hiển thị thêm
+                        </button>
+
+                        <!-- Thông tin bổ sung (ban đầu ẩn) -->
+                        <div id="additionalInfo" style="display: none;">
+                            <div class="form-group">
+                                <label for="address">Địa chỉ</label>
+                                <input type="text"
+                                       id="address"
+                                       class="form-control"
+                                       placeholder="Địa chỉ mới"
+                                       asp-for="@Model.Address" required />
+                            </div>
+                            <div class="form-group">
+                                <label for="dob">Ngày sinh</label>
+                                <input type="date" id="dob" class="form-control" asp-for="@Model.dob" />
+                            </div>
+                            <div class="form-group">
+                                <label for="newPassword">Mật khẩu</label>
+                                <input type="password"
+                                       id="newPassword"
+                                       class="form-control"
+                                       placeholder="Nhập mật khẩu mới"
+                                       asp-for="@Model.Password" required
+                                       oninvalid="this.setCustomValidity('Hãy điền ô này.')"
+                                       oninput="setCustomValidity('')" />
+                            </div>
+                            <div class="form-group">
+                                <label for="confirmPassword">Xác nhận mật khẩu</label>
+                                <input type="password"
+                                       id="confirmPassword"
+                                       class="form-control"
+                                       placeholder="Xác nhận mật khẩu mới"
+                                       asp-for="@Model.PasswordRepeat" required
+                                       oninvalid="this.setCustomValidity('Hãy điền ô này.')"
+                                       oninput="setCustomValidity('')" />
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            Lưu thay đổi
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid pt-5">
+        <h2 class="text-center mb-4">Đơn hàng của bạn</h2>
+        <ul class="nav nav-tabs justify-content-center " id="orderTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active-tab" id="processing-tab" data-bs-toggle="tab" data-bs-target="#processing" type="button" role="tab" aria-controls="processing" aria-selected="true">Đang xử lí</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active-tab" id="delivering-tab" data-bs-toggle="tab" data-bs-target="#delivering" type="button" role="tab" aria-controls="delivering" aria-selected="false">Đang vận chuyển</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active-tab" id="delivered-tab" data-bs-toggle="tab" data-bs-target="#delivered" type="button" role="tab" aria-controls="delivered" aria-selected="false">Đã vận chuyển</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active-tab" id="rejected-tab" data-bs-toggle="tab" data-bs-target="#rejected" type="button" role="tab" aria-controls="rejected" aria-selected="false">Huỷ đơn</button>
+            </li>
+        </ul>
+        <div class="tab-content" id="orderTabsContent">
+            <div class="tab-pane fade show active" id="processing" role="tabpanel" aria-labelledby="processing-tab">
+                <!-- Processing Orders Table -->
+                <div class="row px-xl-5">
+                    <div class="col-lg-12 table-responsive">
+                        <table class="table table-bordered text-center">
+                            <thead class="bg-secondary text-dark">
+                                <tr>
+                                    <th>Mã đơn hàng</th>
+                                    <th>Ngày</th>
+                                    <th style="width: 30%;">Số lượng sản phẩm trong đơn hàng</th>
+                                    <th>Tổng cộng</th>
+                                    <th>Trạng thái</th>
+                                    <th>Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody class="align-middle">
+                                <!-- Dữ liệu mẫu lịc    h sử đơn hàng -->
+                                @if (Model.orderPending.Count != 0)
+                                {
+                                    @foreach (var item in Model.orderPending)
+                                    {
+                                        <tr>
+                                            <td class="align-middle">
+                                                <a asp-page="./OrderDetail" asp-route-orderID="@item.OrderId">@item.OrderId</a>
+                                            </td>
+                                            <td class="align-middle">@item.OrderDate</td>
+                                            @{
+                                                Model.countOrderDetail = Model.countProductInOrder(item.OrderId);
+                                            }
+                                            <td class="align-middle">@Model.countOrderDetail sản phẩm</td>
+                                            <td class="align-middle">@Html.Raw(item.OrderPrice.Value.ToString("N0"))đ</td>
+                                            @if (item.OrderStatus == "Pending")
+                                            {
+                                                <td class="align-middle">Đang đợi</td>
+                                                <td>
+                                                    <input type="hidden" id="orderIDCancelation" value="@item.OrderId">
+                                                    <button id="cancelOrderBtn" type="button" class="btn btn-sm"
+                                                            style="background-color: #ff786f; color: white;"
+                                                            data-toggle="modal"
+                                                            data-target="#cancelOrderModal"
+                                                            data-order-id="@item.OrderId">
+                                                        Huỷ đơn hàng
+                                                    </button>
+
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="delivering" role="tabpanel" aria-labelledby="delivering-tab">
+                <!-- Delivering Orders Table -->
+                <div class="row px-xl-5">
+                    <div class="col-lg-12 table-responsive">
+                        <table class="table table-bordered text-center">
+                            <thead class="bg-secondary text-dark">
+                                <tr>
+                                    <th>Mã đơn hàng</th>
+                                    <th>Ngày</th>
+                                    <th style="width: 30%;">Số lượng sản phẩm trong đơn hàng</th>
+                                    <th>Tổng cộng</th>
+                                    <th>Ghi chú</th>
+                                </tr>
+                            </thead>
+                            <tbody class="align-middle">
+                                <!-- Dữ liệu mẫu lịch sử đơn hàng -->
+                                @if (Model.orderDelivering.Count != 0)
+                                {
+                                    @foreach (var item in Model.orderDelivering)
+                                    {
+                                        <tr>
+                                            <td class="align-middle">
+                                                <a asp-page="./OrderDetail" asp-route-orderID="@item.OrderId">@item.OrderId</a>
+                                            </td>
+                                            <td class="align-middle">@item.OrderDate</td>
+                                            @{
+                                                Model.countOrderDetail = Model.countProductInOrder(item.OrderId);
+                                            }
+                                            <td class="align-middle">@Model.countOrderDetail sản phẩm</td>
+                                            <td class="align-middle">@Html.Raw(item.OrderPrice.Value.ToString("N0"))</td>
+                                            <td>@item.Note</td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="delivered" role="tabpanel" aria-labelledby="delivered-tab">
+                <!-- Delivered Orders Table -->
+                <div class="row px-xl-5">
+                    <div class="col-lg-12 table-responsive">
+                        <table class="table table-bordered text-center">
+                            <thead class="bg-secondary text-dark">
+                                <tr>
+                                    <th>Mã đơn hàng</th>
+                                    <th>Ngày</th>
+                                    <th style="width: 30%;">Số lượng sản phẩm trong đơn hàng</th>
+                                    <th>Tổng cộng</th>
+                                    <th>Trạng thái</th>
+                                    <th>Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody class="align-middle">
+                                <!-- Dữ liệu mẫu lịc    h sử đơn hàng -->
+                                @if (Model.orderDelivered.Count != 0)
+                                {
+                                    @foreach (var item in Model.orderDelivered)
+                                    {
+                                        <tr>
+                                            <td class="align-middle">
+                                                <a asp-page="./OrderDetail" asp-route-orderID="@item.OrderId"   >@item.OrderId</a>
+                                            </td>
+                                            <td class="align-middle">@item.OrderDate</td>
+                                            @{
+                                                Model.countOrderDetail = Model.countProductInOrder(item.OrderId);
+                                            }
+                                            <td class="align-middle">@Model.countOrderDetail sản phẩm</td>
+                                            <td class="align-middle">@Html.Raw(item.OrderPrice.Value.ToString("N0"))</td>
+                                            @if (item.OrderStatus == "Delivered")
+                                            {
+                                                <td class="align-middle">Đã giao hàng</td>
+                                                <td>
+                                                    <a asp-page="../Users/Feedback" asp-route-orderID="@item.OrderId" class="btn btn-sm" style="background-color: #d19c97; color: white;">Đánh giá</a>
+
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="rejected" role="tabpanel" aria-labelledby="rejected-tab">
+                <!-- Rejected Orders Table -->
+                <div class="row px-xl-5">
+                    <div class="col-lg-12 table-responsive">
+                        <table class="table table-bordered text-center">
+                            <thead class="bg-secondary text-dark">
+                                <tr>
+                                    <th>Mã đơn hàng</th>
+                                    <th>Ngày</th>
+                                    <th style="width: 30%;">Số lượng sản phẩm trong đơn hàng</th>
+                                    <th>Tổng cộng</th>
+                                    <th>Lý do</th>
+                                </tr>
+                            </thead>
+                            <tbody class="align-middle">
+                                <!-- Dữ liệu mẫu lịc    h sử đơn hàng -->
+                                @if (Model.orderCancel.Count != 0)
+                                {
+                                    @foreach (var item in Model.orderCancel)
+                                    {
+                                        <tr>
+                                            <td class="align-middle">
+                                                <a href="#"
+                                                   class="order-link"
+                                                   data-toggle="modal"
+                                                   data-target="#orderDetailModal"
+                                                   data-order-id="@item.OrderId">@item.OrderId</a>
+                                            </td>
+                                            <td class="align-middle">@item.OrderDate</td>
+                                            @{
+                                                Model.countOrderDetail = Model.countProductInOrder(item.OrderId);
+                                            }
+                                            <td class="align-middle">@Model.countOrderDetail sản phẩm</td>
+                                            <td class="align-middle">@Html.Raw(item.OrderPrice.Value.ToString("N0"))</td>
+                                            <td class="align-middle">@item.Note</td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                         
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="cancelOrderModal" tabindex="-1" role="dialog" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelOrderModalLabel">Lý do huỷ đơn hàng</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" asp-page-handler="CancelTheOrder" onsubmit="return validateSelection()">
+                        <input type="text" id="orderIDCancelationForm" name="orderId" value="">
+                        <div class="form-group">
+                            <label for="cancelOptions">Lựa chọn lý do:</label>
+                            <select class="form-control" id="cancelOptions" name="cancelOptions">
+                                <option value="">Chọn lý do</option>
+                                <option value="Thời gian gia công quá lâu">Thời gian gia công quá lâu</option>
+                                <option value="Thay đổi ý định mua">Thay đổi ý định mua</option>
+                                <option value="Nơi khác có giá rẻ hơn">Nơi khác có giá rẻ hơn</option>
+                                <option value="other">Lý do khác</option>
+                            </select>
+                            <div id="selectError" style="color: red; display: none;">Vui lòng chọn một lý do</div>
+                        </div>
+                        <button type="submit" class="btn btn-danger">Xác nhận huỷ đơn hàng</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <script>
+        // Remove the current sendOrderID() function
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const cancelOrderButtons = document.querySelectorAll("#cancelOrderBtn");
+            const orderIdCancellationForm = document.getElementById("orderIDCancelationForm");
+
+            cancelOrderButtons.forEach((button) => {
+                button.addEventListener("click", function () {
+                    const orderId = button.getAttribute("data-order-id");
+                    orderIdCancellationForm.value = orderId;
+                });
+            });
+        });
+
+    </script>
+
+    <script>
+        function validateSelection() {
+            var selectedOption = document.getElementById("cancelOptions");
+            var errorDiv = document.getElementById("selectError");
+
+            if (selectedOption.value === "") {
+                errorDiv.style.display = "block";
+                return false; // Prevent form submission
+            } else {
+                errorDiv.style.display = "none";
+                return true; // Allow form submission
+            }
+        }
+
+
+    </script>
+
+
+    <script>
+        const toggleButton = document.getElementById("toggleInfo");
+        const additionalInfo = document.getElementById("additionalInfo");
+
+        // Xử lý sự kiện khi nút "Show" được nhấn
+        toggleButton.addEventListener("click", function () {
+            if (additionalInfo.style.display === "none") {
+                additionalInfo.style.display = "block";
+                toggleButton.innerText = "Hide"; // Thay đổi nút thành "Hide"
+            } else {
+                additionalInfo.style.display = "none";
+                toggleButton.innerText = "Show More"; // Thay đổi nút thành "Show More"
+            }
+        });
+    </script>
+
+
+
+
+    <script>
+        const toggleButton = document.getElementById("toggleInfo");
+        const additionalInfo = document.getElementById("additionalInfo");
+
+        // Xử lý sự kiện khi nút "Show" được nhấn
+        toggleButton.addEventListener("click", function () {
+            if (additionalInfo.style.display === "none") {
+                additionalInfo.style.display = "block";
+                toggleButton.innerText = "Hide"; // Thay đổi nút thành "Hide"
+            } else {
+                additionalInfo.style.display = "none";
+                toggleButton.innerText = "Show More"; // Thay đổi nút thành "Show More"
+            }
+        });
+    </script>
+
+
+
+    <!-- JavaScript Libraries -->
+</body>
+</html>
